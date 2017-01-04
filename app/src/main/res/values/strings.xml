@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">新浪新闻</string>
+
+    <string name="socia">社会</string>
+    <string name="mobile">移动</string>
+    <string name="Nba">NBA</string>
+    <string name="Huabian">娱乐</string>
+    <string name="keji">科技</string>
+</resources>
