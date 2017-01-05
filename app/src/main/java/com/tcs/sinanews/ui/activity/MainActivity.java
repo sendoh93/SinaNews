@@ -1,4 +1,4 @@
-package com.tcs.sinanews.ui;
+package com.tcs.sinanews.ui.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;

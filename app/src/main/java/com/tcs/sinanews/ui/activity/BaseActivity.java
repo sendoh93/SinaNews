@@ -1,4 +1,4 @@
-package com.tcs.sinanews.ui;
+package com.tcs.sinanews.ui.activity;
 
 import android.graphics.drawable.Drawable;
 import android.os.Build;
