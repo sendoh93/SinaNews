@@ -41,6 +41,7 @@ public class CustomProgressDialog extends ProgressDialog {
 		initData();
 	}
 
+
 	private void initData() {
 
 		mImageView.setBackgroundResource(mResid);
