@@ -16,6 +16,7 @@ import com.tcs.sinanews.bean.NewsCode;
 import com.tcs.sinanews.bean.NewsList;
 import com.tcs.sinanews.netwrok.NewAPiServer;
 import com.tcs.sinanews.netwrok.RetrofitUtils;
+import com.tcs.sinanews.utils.ToastUtil;
 import com.tcs.sinanews.widget.CustomProgressDialog;
 
 import java.util.ArrayList;
@@ -42,18 +43,18 @@ public class NewsFragment extends BaseFragment {
     private CustomProgressDialog mDialog;
     private long startTime;
 
-    public static NewsFragment newInstance(Integer newsType){
+    public static NewsFragment newInstance(Integer newsType) {
         NewsFragment newsFragment = new NewsFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("newsType",newsType);
+        bundle.putInt("newsType", newsType);
         newsFragment.setArguments(bundle);
         return newsFragment;
     }
 
     private class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public   SimpleDraweeView mSimpleDraweeView;
-        public  TextView mMTv;
+        public SimpleDraweeView mSimpleDraweeView;
+        public TextView mMTv;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -67,59 +68,67 @@ public class NewsFragment extends BaseFragment {
         parms.put(1, "30");
         NewAPiServer newAPiServer = RetrofitUtils.newInstance();
         mDialog = new CustomProgressDialog(getActivity(), "正在加载中...", R.drawable.frame, R.style.ProgressDialog);
+        mDialog.setCancelable(false);
         mDialog.show();
-        loadMobile(newAPiServer,type);
-        startTime=System.currentTimeMillis();
+        loadMobile(newAPiServer, type);
+        startTime = System.currentTimeMillis();
     }
 
 
+    private void loadMobile(NewAPiServer newAPiServer, int type) {
 
-    private void loadMobile(NewAPiServer newAPiServer,int type) {
-
-        switch (type)
-        {
+        switch (type) {
             case 0:
-                mobile = newAPiServer.GetSocialNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetSocialNew(parms.get(0), parms.get(1));
                 break;
             case 1:
-                mobile = newAPiServer.GetItNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetItNew(parms.get(0), parms.get(1));
                 break;
             case 2:
-                mobile = newAPiServer.GetmobileNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetmobileNew(parms.get(0), parms.get(1));
                 break;
             case 3:
-                mobile = newAPiServer.GetkejiNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetkejiNew(parms.get(0), parms.get(1));
                 break;
             case 4:
-                mobile = newAPiServer.GetNbaNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetNbaNew(parms.get(0), parms.get(1));
                 break;
             case 5:
-                mobile = newAPiServer.GetTravel(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetTravel(parms.get(0), parms.get(1));
                 break;
             case 6:
-                mobile = newAPiServer.GetMeinv(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetMeinv(parms.get(0), parms.get(1));
                 break;
             default:
-                mobile = newAPiServer.GetmobileNew(parms.get(0),parms.get(1));
+                mobile = newAPiServer.GetmobileNew(parms.get(0), parms.get(1));
         }
 
         mobile.enqueue(new Callback<NewsCode>() {
             @Override
             public void onResponse(Call<NewsCode> call, Response<NewsCode> response) {
-                if (response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
                     news = response.body().getNewslist();
                     long endTime = System.currentTimeMillis();
-
                     Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDialog.dismiss();
-                            mAdapter.notifyDataSetChanged();
+                    if (endTime - startTime <= 2000) {
 
-                        }
-                    },2000-endTime+startTime);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mDialog.dismiss();
+                                mAdapter.notifyDataSetChanged();
+
+                            }
+                        }, 2000 - endTime + startTime);
+                    }else {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mDialog.dismiss();
+                                ToastUtil.showToastLong(getActivity(),"请求失败,请稍后再试.");
+                            }
+                        },5000-endTime +startTime);
+                    }
 
                     /*if (endTime - startTime <=2000){
                         Thread t = new Thread(new Runnable() {
@@ -148,18 +157,17 @@ public class NewsFragment extends BaseFragment {
 
             @Override
             public void onFailure(Call<NewsCode> call, Throwable t) {
-                    mDialog.dismiss();
-                Toast.makeText(getActivity(),t.toString(),Toast.LENGTH_LONG).show();
+                mDialog.dismiss();
+                Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
 
-
     @Override
     public void init(Bundle savedInstanceState) {
 
-       mNewsType =  getArguments().getInt("newsType",0);
+        mNewsType = getArguments().getInt("newsType", 0);
 
     }
 
@@ -174,7 +182,7 @@ public class NewsFragment extends BaseFragment {
             @Override
             public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = View.inflate(getActivity(), R.layout.item_news, null);
-                return new  MyViewHolder(view);
+                return new MyViewHolder(view);
             }
 
             @Override
