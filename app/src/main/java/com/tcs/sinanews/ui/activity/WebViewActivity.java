@@ -29,7 +29,7 @@ public class WebViewActivity extends BaseActivity {
     @Override
     protected void init(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
-        String url = bundle.getString("newsUrl");
+        final String url = bundle.getString("newsUrl");
         mWebview.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -59,7 +59,13 @@ public class WebViewActivity extends BaseActivity {
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWebview.goBack();
+                if (mWebview.getOriginalUrl() == mWebview.getUrl())
+                {
+                    finish();
+                }
+                else {
+                    mWebview.goBack();
+                }
             }
         });
     }
@@ -79,4 +85,15 @@ public class WebViewActivity extends BaseActivity {
         return true;
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mWebview.getSettings().setJavaScriptEnabled(false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mWebview.getSettings().setJavaScriptEnabled(false);
+    }
 }

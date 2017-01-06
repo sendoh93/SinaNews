@@ -116,23 +116,17 @@ public class NewsFragment extends BaseFragment {
                     long endTime = System.currentTimeMillis();
                     Handler handler = new Handler();
                     if (endTime - startTime <= 2000) {
-
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 mDialog.dismiss();
                                 mAdapter.notifyDataSetChanged();
-
                             }
                         }, 2000 - endTime + startTime);
-                    }else {
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mDialog.dismiss();
-                                ToastUtil.showToastLong(getActivity(),"请求超时,请稍后再试.");
-                            }
-                        },5000-endTime +startTime);
+                    } else {
+                        mDialog.dismiss();
+                        mAdapter.notifyDataSetChanged();
+                        ToastUtil.showToastLong(getActivity(), "请求超时,请稍后再试.");
                     }
 
                     /*if (endTime - startTime <=2000){
@@ -198,8 +192,8 @@ public class NewsFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         Bundle bundle = new Bundle();
-                        bundle.putString("newsUrl",news.get(position).getUrl());
-                        ((BaseActivity)mContext).startActivity(WebViewActivity.class,bundle);
+                        bundle.putString("newsUrl", news.get(position).getUrl());
+                        ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
                     }
                 });
             }
