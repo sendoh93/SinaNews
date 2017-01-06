@@ -69,4 +69,9 @@ public class MainActivity extends BaseActivity {
         return Constant.Titles[0];
     }
 
+    @Override
+    protected boolean needToolBarButton() {
+        return false;
+    }
+
 }

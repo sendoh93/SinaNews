@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.tcs.sinanews.bean.NewsCode;
 import com.tcs.sinanews.bean.NewsList;
 import com.tcs.sinanews.netwrok.NewAPiServer;
 import com.tcs.sinanews.netwrok.RetrofitUtils;
+import com.tcs.sinanews.ui.activity.BaseActivity;
+import com.tcs.sinanews.ui.activity.WebViewActivity;
 import com.tcs.sinanews.utils.ToastUtil;
 import com.tcs.sinanews.widget.CustomProgressDialog;
 
@@ -55,11 +58,13 @@ public class NewsFragment extends BaseFragment {
 
         public SimpleDraweeView mSimpleDraweeView;
         public TextView mMTv;
+        public LinearLayout mLlnews;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             mSimpleDraweeView = (SimpleDraweeView) itemView.findViewById(R.id.new_pic);
             mMTv = (TextView) itemView.findViewById(R.id.tv_news_title);
+            mLlnews = (LinearLayout) itemView.findViewById(R.id.ll_news);
         }
     }
 
@@ -125,7 +130,7 @@ public class NewsFragment extends BaseFragment {
                             @Override
                             public void run() {
                                 mDialog.dismiss();
-                                ToastUtil.showToastLong(getActivity(),"请求失败,请稍后再试.");
+                                ToastUtil.showToastLong(getActivity(),"请求超时,请稍后再试.");
                             }
                         },5000-endTime +startTime);
                     }
@@ -186,9 +191,17 @@ public class NewsFragment extends BaseFragment {
             }
 
             @Override
-            public void onBindViewHolder(MyViewHolder holder, int position) {
+            public void onBindViewHolder(MyViewHolder holder, final int position) {
                 holder.mSimpleDraweeView.setImageURI(news.get(position).getPicUrl());
                 holder.mMTv.setText(news.get(position).getTitle());
+                holder.mLlnews.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("newsUrl",news.get(position).getUrl());
+                        ((BaseActivity)mContext).startActivity(WebViewActivity.class,bundle);
+                    }
+                });
             }
 
             @Override

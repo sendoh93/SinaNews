@@ -1,11 +1,15 @@
 package com.tcs.sinanews.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.tcs.sinanews.ui.activity.BaseActivity;
 
 import butterknife.ButterKnife;
 
@@ -14,6 +18,7 @@ import butterknife.ButterKnife;
  */
 
 public abstract class BaseFragment extends Fragment {
+    protected Context mContext;
     public abstract void init(Bundle savedInstanceState);
     public abstract int getResourceId();
     public abstract void initView(View view);
@@ -22,6 +27,16 @@ public abstract class BaseFragment extends Fragment {
 
     private boolean mIsFirstVisible = true;
     private boolean mIsPrepared = false;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+        FragmentActivity fragmentActivity = (FragmentActivity) context;
+        if (!(fragmentActivity instanceof BaseActivity))
+            throw new RuntimeException("所使用的Activity必须依附于BaseActivity");
+
+    }
 
 
     @Override

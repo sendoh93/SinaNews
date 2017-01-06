@@ -1,5 +1,8 @@
 package com.tcs.sinanews.ui.activity;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,10 +25,13 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity {
     protected Toolbar mToolbar;
 
+    protected Context mContext;
+
     protected abstract int getLayoutResId();
     protected abstract void init(Bundle savedInstanceState);
     protected abstract boolean applySystemBarDrawable();
     protected abstract int getTitleResId();
+    protected abstract boolean needToolBarButton();
 
     protected boolean applyTranslucentStatus() {
         return true;
@@ -33,6 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this ;
         setTranslucentStatus(applyTranslucentStatus());
         if (applySystemBarDrawable()) {
             setSystemBarTintDrawable(getResources().getDrawable(R.drawable.drawable_primary));
@@ -46,8 +53,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 mToolbar.setTitle(getTitleResId());
             }
             setSupportActionBar(mToolbar);
-            getSupportActionBar().setHomeButtonEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setHomeButtonEnabled(needToolBarButton());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(needToolBarButton());
         }
         init(savedInstanceState);
     }
@@ -77,5 +84,22 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
             win.setAttributes(winParams);
         }
+    }
+
+    /**
+     * 启动新的Activity
+     * @param newActivty  新的Actiivty
+     * @param bundle        需要传递的参数
+     */
+    public void startActivity(Class<? extends Activity> newActivty,Bundle bundle){
+        Intent intent = new Intent(mContext,newActivty);
+        if (bundle != null)
+            intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+    public void startActivity(Class<? extends Activity> newAcivity)
+    {
+        startActivity(newAcivity,null);
     }
 }
