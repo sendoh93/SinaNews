@@ -2,6 +2,7 @@ package com.tcs.sinanews.ui.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
@@ -19,13 +20,13 @@ import com.tcs.sinanews.netwrok.NewAPiServer;
 import com.tcs.sinanews.netwrok.RetrofitUtils;
 import com.tcs.sinanews.ui.activity.BaseActivity;
 import com.tcs.sinanews.ui.activity.WebViewActivity;
-import com.tcs.sinanews.utils.ToastUtil;
 import com.tcs.sinanews.widget.CustomProgressDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +38,8 @@ import retrofit2.Response;
 public class NewsFragment extends BaseFragment {
     @Bind(R.id.rv_news)
     RecyclerView mRvNews;
+    @Bind(R.id.swl_refresh)
+    SwipeRefreshLayout mSwlRefresh;
     private List<NewsList> news = new ArrayList<>();
     private SparseArray<List<NewsList>> showNews = new SparseArray<>();
     private SparseArray<String> parms = new SparseArray<>();
@@ -45,6 +48,7 @@ public class NewsFragment extends BaseFragment {
     private Call<NewsCode> mobile;
     private CustomProgressDialog mDialog;
     private long startTime;
+    private NewAPiServer mNewAPiServer;
 
     public static NewsFragment newInstance(Integer newsType) {
         NewsFragment newsFragment = new NewsFragment();
@@ -52,6 +56,13 @@ public class NewsFragment extends BaseFragment {
         bundle.putInt("newsType", newsType);
         newsFragment.setArguments(bundle);
         return newsFragment;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     private class MyViewHolder extends RecyclerView.ViewHolder {
@@ -71,17 +82,17 @@ public class NewsFragment extends BaseFragment {
     private void getData(int type) {
         parms.put(0, "c25e79b36387196ad9cf3620f4fe059a");
         parms.put(1, "30");
-        NewAPiServer newAPiServer = RetrofitUtils.newInstance();
+        mNewAPiServer = RetrofitUtils.newInstance();
         mDialog = new CustomProgressDialog(getActivity(), "正在加载中...", R.drawable.frame, R.style.ProgressDialog);
         mDialog.setCancelable(false);
         mDialog.show();
-        loadMobile(newAPiServer, type);
+        loadMobile(mNewAPiServer, type);
         startTime = System.currentTimeMillis();
     }
 
 
     private void loadMobile(NewAPiServer newAPiServer, int type) {
-
+        startTime = System.currentTimeMillis();
         switch (type) {
             case 0:
                 mobile = newAPiServer.GetSocialNew(parms.get(0), parms.get(1));
@@ -115,41 +126,20 @@ public class NewsFragment extends BaseFragment {
                     news = response.body().getNewslist();
                     long endTime = System.currentTimeMillis();
                     Handler handler = new Handler();
-                    if (endTime - startTime <= 2000) {
+                    if (endTime - startTime <= 1600) {
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 mDialog.dismiss();
                                 mAdapter.notifyDataSetChanged();
+                                mSwlRefresh.setRefreshing(false);
                             }
-                        }, 2000 - endTime + startTime);
-                    } else {
+                        }, 1600 - endTime + startTime);
+                    }else {
                         mDialog.dismiss();
                         mAdapter.notifyDataSetChanged();
-                        ToastUtil.showToastLong(getActivity(), "请求超时,请稍后再试.");
+                        mSwlRefresh.setRefreshing(false);
                     }
-
-                    /*if (endTime - startTime <=2000){
-                        Thread t = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mDialog.dismiss();
-                                       *//* mAdapter.notifyDataSetChanged();*//*
-                                    }
-                                });
-                            }
-                        });
-                        try {
-                            t.wait(2000-endTime+startTime);
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        t.start();
-                    }*/
 
                 }
             }
@@ -168,6 +158,7 @@ public class NewsFragment extends BaseFragment {
 
         mNewsType = getArguments().getInt("newsType", 0);
 
+
     }
 
     @Override
@@ -177,6 +168,17 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     public void initView(View view) {
+        //下拉监听
+        mSwlRefresh.setProgressViewEndTarget(true,170);
+        mSwlRefresh.setColorSchemeResources(R.color.toolbar);
+        mSwlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                loadMobile(mNewAPiServer,mNewsType);
+            }
+        });
+
         mAdapter = new RecyclerView.Adapter<MyViewHolder>() {
             @Override
             public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
