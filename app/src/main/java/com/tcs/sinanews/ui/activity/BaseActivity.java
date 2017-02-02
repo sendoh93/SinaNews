@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.tcs.sinanews.R;
+import com.tcs.sinanews.ui.activity.interfaces.ActivityInterface;
 
 import butterknife.ButterKnife;
 
@@ -22,7 +23,7 @@ import butterknife.ButterKnife;
  * Created by Administrator on 2016/12/29.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements ActivityInterface{
     protected Toolbar mToolbar;
 
     protected Context mContext;
@@ -32,6 +33,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract boolean applySystemBarDrawable();
     protected abstract int getTitleResId();
     protected abstract boolean needToolBarButton();
+
+    @Override
+    public void initBefore() {
+
+    }
 
     protected boolean applyTranslucentStatus() {
         return true;
@@ -45,6 +51,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             setSystemBarTintDrawable(getResources().getDrawable(R.drawable.drawable_primary));
         }
         Fresco.initialize(this);
+        initBefore();
         setContentView(getLayoutResId());
         ButterKnife.bind(this);
         mToolbar = ButterKnife.findById(this, R.id.toolbar);

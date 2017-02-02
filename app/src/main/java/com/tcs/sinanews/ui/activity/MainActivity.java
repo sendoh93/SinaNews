@@ -1,6 +1,7 @@
 package com.tcs.sinanews.ui.activity;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -72,6 +73,11 @@ public class MainActivity extends BaseActivity {
     @Override
     protected boolean needToolBarButton() {
         return false;
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
 }

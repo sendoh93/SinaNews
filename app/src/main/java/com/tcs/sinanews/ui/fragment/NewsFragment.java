@@ -196,6 +196,7 @@ public class NewsFragment extends BaseFragment {
                         Bundle bundle = new Bundle();
                         bundle.putString("newsUrl", news.get(position).getUrl());
                         ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
+                        getActivity().overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
                     }
                 });
             }

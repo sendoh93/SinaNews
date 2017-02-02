@@ -96,4 +96,5 @@ public class WebViewActivity extends BaseActivity {
         super.onDestroy();
         mWebview.getSettings().setJavaScriptEnabled(false);
     }
+
 }
