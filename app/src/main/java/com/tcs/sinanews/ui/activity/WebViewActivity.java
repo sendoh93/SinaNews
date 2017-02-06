@@ -97,4 +97,9 @@ public class WebViewActivity extends BaseActivity {
         mWebview.getSettings().setJavaScriptEnabled(false);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+    }
 }
