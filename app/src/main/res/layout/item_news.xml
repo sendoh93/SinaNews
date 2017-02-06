@@ -4,18 +4,19 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
-              android:padding="8dp">
+              android:padding="12dp">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/new_pic"
-        android:layout_width="125dp"
-        android:layout_height="90dp"/>
+        android:layout_width="100dp"
+        android:layout_height="70dp"/>
 
     <TextView
         android:id="@+id/tv_news_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
+        android:textColor="#000000"
         android:text="火箭和勇士联手创NBA三分纪录"
-        android:textSize="18sp"/>
+        android:textSize="16sp"/>
 </LinearLayout>
