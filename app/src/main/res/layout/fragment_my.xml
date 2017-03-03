@@ -32,9 +32,10 @@
         android:gravity="center_vertical"
         android:layout_height="wrap_content">
         <ImageView
-            android:layout_width="30dp"
+            android:layout_width="25dp"
             android:layout_marginLeft="15dp"
-            android:layout_height="30dp"/>
+            android:src="@mipmap/moon"
+            android:layout_height="25dp"/>
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
