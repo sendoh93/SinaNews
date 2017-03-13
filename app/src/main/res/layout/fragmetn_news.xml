@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
@@ -7,16 +8,30 @@
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swl_refresh"
         android:layout_width="match_parent"
-
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_news"
-            android:background="#F6F6F6"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+            <com.bigkoo.convenientbanner.ConvenientBanner
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:background="#F6F6F6"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                app:canLoop="true"></com.bigkoo.convenientbanner.ConvenientBanner>
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_news"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F6F6F6">
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

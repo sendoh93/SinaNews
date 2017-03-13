@@ -6,12 +6,16 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bigkoo.convenientbanner.ConvenientBanner;
+import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
+import com.bigkoo.convenientbanner.listener.OnItemClickListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.tcs.sinanews.R;
 import com.tcs.sinanews.bean.NewsCode;
@@ -20,6 +24,7 @@ import com.tcs.sinanews.netwrok.NewAPiServer;
 import com.tcs.sinanews.netwrok.RetrofitUtils;
 import com.tcs.sinanews.ui.activity.BaseActivity;
 import com.tcs.sinanews.ui.activity.WebViewActivity;
+import com.tcs.sinanews.ui.viewHolder.NetworkImageHolderView;
 import com.tcs.sinanews.widget.CustomProgressDialog;
 
 import java.util.ArrayList;
@@ -35,11 +40,13 @@ import retrofit2.Response;
  * Created by Administrator on 2016/12/29.
  */
 
-public class NewsFragment extends BaseFragment {
+public class NewsFragment extends BaseFragment implements OnItemClickListener {
     @Bind(R.id.rv_news)
     RecyclerView mRvNews;
     @Bind(R.id.swl_refresh)
     SwipeRefreshLayout mSwlRefresh;
+    @Bind(R.id.banner)
+    ConvenientBanner mBanner;
     private List<NewsList> news = new ArrayList<>();
     private SparseArray<List<NewsList>> showNews = new SparseArray<>();
     private SparseArray<String> parms = new SparseArray<>();
@@ -49,6 +56,8 @@ public class NewsFragment extends BaseFragment {
     private CustomProgressDialog mDialog;
     private long startTime;
     private NewAPiServer mNewAPiServer;
+    //广告栏使用的数据
+    private List<String> mBannerList = new ArrayList<>();
 
     public static NewsFragment newInstance(Integer newsType) {
         NewsFragment newsFragment = new NewsFragment();
@@ -63,6 +72,23 @@ public class NewsFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO: inflate a fragment view
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        //do something
+        Bundle bundle = new Bundle();
+        bundle.putString("newsUrl", news.get(position).getUrl());
+        ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
+        getActivity().overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
     }
 
     private class MyViewHolder extends RecyclerView.ViewHolder {
@@ -87,6 +113,7 @@ public class NewsFragment extends BaseFragment {
         mDialog.setCancelable(false);
         mDialog.show();
         loadMobile(mNewAPiServer, type);
+
         startTime = System.currentTimeMillis();
     }
 
@@ -133,9 +160,11 @@ public class NewsFragment extends BaseFragment {
                                 mDialog.dismiss();
                                 mAdapter.notifyDataSetChanged();
                                 mSwlRefresh.setRefreshing(false);
+                                initBanner();
                             }
                         }, 1600 - endTime + startTime);
-                    }else {
+                    } else {
+                        initBanner();
                         mDialog.dismiss();
                         mAdapter.notifyDataSetChanged();
                         mSwlRefresh.setRefreshing(false);
@@ -162,61 +191,91 @@ public class NewsFragment extends BaseFragment {
     }
 
     @Override
-    public int getResourceId() {
-        return R.layout.fragmetn_news;
+    public void onResume() {
+        super.onResume();
+        //开始自动翻页
+        mBanner.startTurning(5000);
     }
 
     @Override
-    public void initView(View view) {
-        //下拉监听
-        mSwlRefresh.setProgressViewEndTarget(true,170);
-        mSwlRefresh.setColorSchemeResources(R.color.toolbar);
-        mSwlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-
-                loadMobile(mNewAPiServer,mNewsType);
-            }
-        });
-
-        mAdapter = new RecyclerView.Adapter<MyViewHolder>() {
-            @Override
-            public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View view = View.inflate(getActivity(), R.layout.item_news, null);
-                return new MyViewHolder(view);
-            }
-
-            @Override
-            public void onBindViewHolder(MyViewHolder holder, final int position) {
-                holder.mSimpleDraweeView.setImageURI(news.get(position).getPicUrl());
-                holder.mMTv.setText(news.get(position).getTitle());
-                holder.mLlnews.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("newsUrl", news.get(position).getUrl());
-                        ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
-                        getActivity().overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
-                    }
-                });
-            }
-
-            @Override
-            public int getItemCount() {
-                return news.size();
-            }
-        };
-        mRvNews.setAdapter(mAdapter);
-        mRvNews.setLayoutManager(new LinearLayoutManager(getActivity()));
+    public void onPause() {
+        super.onPause();
+        //停止翻页
+        mBanner.stopTurning();
     }
 
-    @Override
-    protected void onFragmentFirstVisible() {
+    private void initBanner() {
+        mBannerList.clear();
+        for (int i = 0; i < 5; i++) {
+            mBannerList.add(news.get(i).getPicUrl());
+        }
+        mBanner.setPages(new CBViewHolderCreator<NetworkImageHolderView>() {
 
-        getData(mNewsType);
+            @Override
+            public NetworkImageHolderView createHolder() {
+                return new NetworkImageHolderView();
+            }
+        }, mBannerList)
+                .setPageIndicator(new int[]{R.mipmap.ic_page_indicator, R.mipmap.ic_page_indicator_focused})
+                .setOnItemClickListener(this);
+
+    }
+        @Override
+        public int getResourceId () {
+            return R.layout.fragmetn_news;
+        }
+
+        @Override
+        public void initView (View view){
+            //下拉监听
+            mSwlRefresh.setProgressViewEndTarget(true, 170);
+            mSwlRefresh.setColorSchemeResources(R.color.toolbar);
+            mSwlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+
+                    loadMobile(mNewAPiServer, mNewsType);
+                }
+            });
+
+            mAdapter = new RecyclerView.Adapter<MyViewHolder>() {
+                @Override
+                public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                    View view = View.inflate(getActivity(), R.layout.item_news, null);
+                    return new MyViewHolder(view);
+                }
+
+                @Override
+                public void onBindViewHolder(MyViewHolder holder, final int position) {
+                    holder.mSimpleDraweeView.setImageURI(news.get(position).getPicUrl());
+                    holder.mMTv.setText(news.get(position).getTitle());
+                    holder.mLlnews.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("newsUrl", news.get(position).getUrl());
+                            ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
+                            getActivity().overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                        }
+                    });
+                }
+
+                @Override
+                public int getItemCount() {
+                    return news.size();
+                }
+            };
+            mRvNews.setAdapter(mAdapter);
+            mRvNews.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
+
+        @Override
+        protected void onFragmentFirstVisible () {
+
+            getData(mNewsType);
+
+
+        }
 
 
     }
-
-
-}
