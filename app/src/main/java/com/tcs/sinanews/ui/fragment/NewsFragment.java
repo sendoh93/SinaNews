@@ -19,7 +19,6 @@ import com.tcs.sinanews.netwrok.NewAPiServer;
 import com.tcs.sinanews.netwrok.RetrofitUtils;
 import com.tcs.sinanews.ui.activity.BaseActivity;
 import com.tcs.sinanews.ui.activity.WebViewActivity;
-import com.tcs.sinanews.ui.adapter.IBannerClick;
 import com.tcs.sinanews.ui.adapter.NewsAdapter;
 import com.tcs.sinanews.widget.CustomProgressDialog;
 
@@ -233,18 +232,13 @@ public class NewsFragment extends BaseFragment {
                 }
             });
 
-            mAdapter = new NewsAdapter(mContext, news, new IBannerClick() {
+            mAdapter = new NewsAdapter(mContext, news, new NewsAdapter.RvItemClick() {
                 @Override
-                public void onBannerClick(int position) {
+                public void ItemClick(View view, int position) {
                     Bundle bundle = new Bundle();
                     bundle.putString("newsUrl", news.get(position).getUrl());
                     ((BaseActivity) mContext).startActivity(WebViewActivity.class, bundle);
                     getActivity().overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
-                }
-
-                @Override
-                public void getBanner(ConvenientBanner banner) {
-                    mBanner = banner;
                 }
             });
             mRvNews.setAdapter(mAdapter);

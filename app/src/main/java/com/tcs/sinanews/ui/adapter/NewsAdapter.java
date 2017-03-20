@@ -32,12 +32,21 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     //是否下来刷新
     private boolean refresh=false;
     private LayoutInflater mInflater;
-    private IBannerClick mClick;
-    public NewsAdapter(Context context, List<NewsList> news,IBannerClick bannerClick) {
+    private RvItemClick mItemClick = null;
+    public NewsAdapter(Context context, List<NewsList> news,RvItemClick itemClick) {
         mContext = context;
         mNewsLists = news;
-        mClick = bannerClick;
+        mItemClick = itemClick;
         mInflater = LayoutInflater.from(context);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        mItemClick.ItemClick(null,position);
+    }
+
+    public interface RvItemClick{
+        void ItemClick(View view,int position);
     }
 
     @Override
@@ -56,15 +65,21 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof NewsViewHolder) {
             NewsViewHolder newsViewHolder = (NewsViewHolder) holder;
             //由于header放置了一个图片轮播器占据了第0,1,2.3,4   5个位置，所以position从5开始
             NewsList newsList = mNewsLists.get(position + NUM_IMAGE - 1);
             newsViewHolder.mSimpleDraweeView.setImageURI(newsList.getPicUrl());
             newsViewHolder.mMTv.setText(newsList.getTitle());
+            newsViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mItemClick.ItemClick(v,position + NUM_IMAGE -1);
+                }
+            });
         } else if (holder instanceof BannerViewHolder) {
-            BannerViewHolder bannerViewHolder = (BannerViewHolder) holder;
+            final BannerViewHolder bannerViewHolder = (BannerViewHolder) holder;
             NewsList newsList = mNewsLists.get(position);
             List<NewsList> mBannerList = new ArrayList<>();
             mBannerList.addAll(mNewsLists.subList(0,NUM_IMAGE));
@@ -76,8 +91,6 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     }
                 }, mBannerList).setPageIndicator(new int[]{R.mipmap.ic_page_indicator, R.mipmap.ic_page_indicator_focused})
                         .setOnItemClickListener(this);
-
-                mClick.getBanner(bannerViewHolder.mBanner);
                 refresh =true;
 
         }
@@ -96,10 +109,6 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             return NORMAL_TYPE;
     }
 
-    @Override
-    public void onItemClick(int position) {
-        mClick.onBannerClick(position);
-    }
 
     public void replaceAll(List<NewsList> items) {
         mNewsLists.clear();
