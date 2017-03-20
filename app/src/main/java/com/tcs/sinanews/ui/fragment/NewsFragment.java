@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bigkoo.convenientbanner.ConvenientBanner;
+import com.tcs.sinanews.Constant;
 import com.tcs.sinanews.R;
 import com.tcs.sinanews.bean.NewsCode;
 import com.tcs.sinanews.bean.NewsList;
@@ -52,6 +53,8 @@ public class NewsFragment extends BaseFragment {
     private NewAPiServer mNewAPiServer;
     //广告栏使用的数据
     private List<String> mBannerList = new ArrayList<>();
+    private int lastVisibleItem;
+    private LinearLayoutManager mLayoutManager ;
 
     public static NewsFragment newInstance(Integer newsType) {
         NewsFragment newsFragment = new NewsFragment();
@@ -101,7 +104,7 @@ public class NewsFragment extends BaseFragment {
 
     private void getData(int type) {
         parms.put(0, "c25e79b36387196ad9cf3620f4fe059a");
-        parms.put(1, "30");
+        parms.put(1, "15");
         mNewAPiServer = RetrofitUtils.newInstance();
         mDialog = new CustomProgressDialog(getActivity(), "正在加载中...", R.drawable.frame, R.style.ProgressDialog);
         mDialog.setCancelable(false);
@@ -151,6 +154,7 @@ public class NewsFragment extends BaseFragment {
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                if (mDialog.isShowing() && mDialog !=null)
                                 mDialog.dismiss();
                                 mAdapter.replaceAll(news);
                                 mSwlRefresh.setRefreshing(false);
@@ -159,9 +163,11 @@ public class NewsFragment extends BaseFragment {
                         }, 1600 - endTime + startTime);
                     } else {
                        /* initBanner();*/
+                        if (mDialog.isShowing() && mDialog !=null)
                         mDialog.dismiss();
                         mAdapter.replaceAll(news);
                         mSwlRefresh.setRefreshing(false);
+                        mAdapter.mFootViewHolder.setData(Constant.Normal);
                     }
 
                 }
@@ -170,7 +176,9 @@ public class NewsFragment extends BaseFragment {
             @Override
             public void onFailure(Call<NewsCode> call, Throwable t) {
                 mDialog.dismiss();
-                Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "请检查网络后重试", Toast.LENGTH_LONG).show();
+                if (null !=mAdapter && null != mAdapter.mFootViewHolder)
+                mAdapter.mFootViewHolder.setData(Constant.NetWorkError);
             }
         });
     }
@@ -227,7 +235,7 @@ public class NewsFragment extends BaseFragment {
             mSwlRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-
+                    parms.setValueAt(1,"20");
                     loadMobile(mNewAPiServer, mNewsType);
                 }
             });
@@ -242,7 +250,35 @@ public class NewsFragment extends BaseFragment {
                 }
             });
             mRvNews.setAdapter(mAdapter);
-            mRvNews.setLayoutManager(new LinearLayoutManager(getActivity()));
+            mLayoutManager = new LinearLayoutManager(getActivity());
+            mRvNews.setLayoutManager(mLayoutManager);
+            mRvNews.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    lastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
+                }
+
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 >=
+                            mLayoutManager.getItemCount()){
+                        int pages =  Integer.parseInt(parms.get(1));
+                        pages = pages+15;
+                        if (null != mAdapter.mFootViewHolder) {
+                            if (pages > 50) {
+                                pages = 50;
+                                mAdapter.mFootViewHolder.setData(Constant.TheEnd);
+                            } else {
+                                mAdapter.mFootViewHolder.setData(Constant.Loading);
+                            }
+                        }
+                        parms.setValueAt(1,String.valueOf(pages));
+                        loadMobile(mNewAPiServer, mNewsType);
+                    }
+                }
+            });
         }
 
         @Override
