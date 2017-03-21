@@ -25,8 +25,6 @@ import android.widget.ScrollView;
 
 import com.trello.rxlifecycle2.LifecycleTransformer;
 
-import net.bither.util.NativeUtil;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,7 +38,6 @@ import java.lang.annotation.Target;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.graphics.Bitmap.createBitmap;

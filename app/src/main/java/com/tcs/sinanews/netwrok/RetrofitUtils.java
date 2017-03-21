@@ -1,8 +1,10 @@
 package com.tcs.sinanews.netwrok;
 
+import android.content.Context;
+
 import com.github.aurae.retrofit2.LoganSquareConverterFactory;
 
-import java.util.concurrent.TimeUnit;
+import java.io.File;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -19,14 +21,18 @@ public class RetrofitUtils {
     static HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
 
     //获取实例
-    public static NewAPiServer newInstance(){
+    public static NewAPiServer newInstance(Context context){
         if (mRetrofit == null)
         {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
-            mOkHttpClient = new OkHttpClient.Builder()
+            mOkHttpClient = new OkHttpManager(context.getCacheDir()+ File.separator +"network",1024*1024*50,5)
+                    .addInterceptor(new ResponseInfoInterceptor(context))
+                    .build();
+          /*  mOkHttpClient = new OkHttpClient.Builder()
                     .connectTimeout(5, TimeUnit.SECONDS)
                     .retryOnConnectionFailure(true)
-                    .build();
+                    .addInterceptor()
+                    .build();*/
             mRetrofit = new Retrofit.Builder()
                     //设置OKHttpClient,如果不设置会提供一个默认的
                     .client(mOkHttpClient)

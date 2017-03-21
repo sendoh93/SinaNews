@@ -23,6 +23,7 @@ public class FootViewHolder extends RecyclerView.ViewHolder {
     public void setData(int states){
         switch (states){
             case Constant.Normal:
+                setAllGone();
                 break;
             case Constant.Loading:
                 setAllGone();

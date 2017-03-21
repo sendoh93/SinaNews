@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:background="@color/white"
+              android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/tv_dialog_content"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="是否确认进店?"
+        android:textColor="#383838"
+        android:textSize="18sp"/>
+
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="45dp"
+        >
+
+        <Button
+            android:id="@+id/btn_dialog_yes"
+            android:layout_width="55dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:background="@null"
+            android:gravity="center"
+            android:text="确认"
+            android:textColor="#4876FF"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/btn_dialog_no"
+            android:layout_width="55dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="20dp"
+            android:layout_toLeftOf="@id/btn_dialog_yes"
+            android:background="@null"
+            android:text="取消"
+            android:textColor="#474747"
+            android:textSize="16sp"/>
+    </RelativeLayout>
+
+</LinearLayout>

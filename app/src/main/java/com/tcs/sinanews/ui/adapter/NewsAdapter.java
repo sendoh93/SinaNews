@@ -125,5 +125,11 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         mNewsLists.addAll(items);
         notifyDataSetChanged();
     }
+
+    public void addAll(List<NewsList> items) {
+        int indexStart = mNewsLists.size();
+        mNewsLists.addAll(items);
+        notifyItemRangeInserted(indexStart, items.size());
+    }
 }
 
