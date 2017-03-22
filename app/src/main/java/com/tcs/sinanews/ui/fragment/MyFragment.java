@@ -90,7 +90,7 @@ public class MyFragment extends BaseFragment {
             case R.id.sv_head:
                 if (judgeLogin())
                     startActivity(LoginActivity.class);
-                else
+                else {
                     mDialog = new normalDialog(mContext, "确定登出账号么?", "取消", "确定", false, new DialogClick() {
                         @Override
                         public void clickYes() {
@@ -115,6 +115,7 @@ public class MyFragment extends BaseFragment {
                                     SnackbarUtil.LongSnackbar(mLlMy, "登出失败", SnackbarUtil.Alert).show();
                                 }
                             });
+                            dismiss();
                         }
 
                         @Override
@@ -122,11 +123,47 @@ public class MyFragment extends BaseFragment {
                             dismiss();
                         }
                     });
+                    mDialog.show();
+                }
                 break;
             case R.id.tv_login:
                 if (judgeLogin())
                     startActivity(LoginActivity.class);
-                else
+                else{
+                    mDialog = new normalDialog(mContext, "确定登出账号么?", "取消", "确定", false, new DialogClick() {
+                        @Override
+                        public void clickYes() {
+                            EMClient.getInstance().logout(true, new EMCallBack() {
+
+                                @Override
+                                public void onSuccess() {
+                                    // TODO Auto-generated method stub
+                                    SnackbarUtil.LongSnackbar(mLlMy, "登出成功", SnackbarUtil.Info).show();
+                                    MyApplication.setUserName("");
+                                }
+
+                                @Override
+                                public void onProgress(int progress, String status) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void onError(int code, String message) {
+                                    // TODO Auto-generated method stub
+                                    SnackbarUtil.LongSnackbar(mLlMy, "登出失败", SnackbarUtil.Alert).show();
+                                }
+                            });
+                            dismiss();
+                        }
+
+                        @Override
+                        public void clickNo() {
+                            dismiss();
+                        }
+                    });
+                    mDialog.show();
+                }
                     break;
             case R.id.ll_clean_cache:
                 mDialog = new normalDialog(mContext, "确定要清楚缓存吗?", "取消", "确定", false, new DialogClick() {

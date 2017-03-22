@@ -22,6 +22,7 @@
             android:src="@mipmap/icon_username"/>
 
         <EditText
+            android:focusable="true"
             android:layout_marginLeft="10dp"
             android:id="@+id/et_username"
             android:layout_width="match_parent"
