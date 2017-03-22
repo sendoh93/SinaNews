@@ -54,4 +54,5 @@ dependencies {
     compile 'com.github.aurae.retrofit2:converter-logansquare:1.4.1'
     compile 'com.kyleduo.switchbutton:library:1.4.5'
     compile 'com.bigkoo:convenientbanner:2.0.5'
+    compile 'org.simple:androideventbus:1.0.5.1'
 }

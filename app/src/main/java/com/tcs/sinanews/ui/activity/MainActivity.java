@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected boolean applySystemBarDrawable() {
-        return true;
+        return false;
     }
 
     @Override

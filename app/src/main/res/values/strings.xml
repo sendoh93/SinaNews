@@ -6,4 +6,6 @@
     <string name="Nba">NBA</string>
     <string name="Huabian">娱乐</string>
     <string name="keji">科技</string>
+
+    <string name="login">登录</string>
 </resources>

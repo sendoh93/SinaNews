@@ -16,6 +16,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.tcs.sinanews.R;
 import com.tcs.sinanews.ui.activity.interfaces.ActivityInterface;
+import com.tcs.sinanews.utils.EventBusHelper;
 
 import butterknife.ButterKnife;
 
@@ -23,15 +24,19 @@ import butterknife.ButterKnife;
  * Created by Administrator on 2016/12/29.
  */
 
-public abstract class BaseActivity extends AppCompatActivity implements ActivityInterface{
+public abstract class BaseActivity extends AppCompatActivity implements ActivityInterface {
     protected Toolbar mToolbar;
 
     protected Context mContext;
 
     protected abstract int getLayoutResId();
+
     protected abstract void init(Bundle savedInstanceState);
+
     protected abstract boolean applySystemBarDrawable();
+
     protected abstract int getTitleResId();
+
     protected abstract boolean needToolBarButton();
 
     @Override
@@ -42,10 +47,12 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
     protected boolean applyTranslucentStatus() {
         return true;
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext = this ;
+        EventBusHelper.register(this);
+        mContext = this;
         setTranslucentStatus(applyTranslucentStatus());
         if (applySystemBarDrawable()) {
             setSystemBarTintDrawable(getResources().getDrawable(R.drawable.drawable_primary));
@@ -64,6 +71,13 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
             getSupportActionBar().setDisplayHomeAsUpEnabled(needToolBarButton());
         }
         init(savedInstanceState);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBusHelper.unregister(this);
     }
 
     private void setSystemBarTintDrawable(Drawable tintDrawable) {
@@ -95,18 +109,25 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
 
     /**
      * 启动新的Activity
-     * @param newActivty  新的Actiivty
-     * @param bundle        需要传递的参数
+     *
+     * @param newActivty 新的Actiivty
+     * @param bundle     需要传递的参数
      */
-    public void startActivity(Class<? extends Activity> newActivty,Bundle bundle){
-        Intent intent = new Intent(mContext,newActivty);
+    public void startActivity(Class<? extends Activity> newActivty, Bundle bundle) {
+        Intent intent = new Intent(mContext, newActivty);
         if (bundle != null)
             intent.putExtras(bundle);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
     }
 
-    public void startActivity(Class<? extends Activity> newAcivity)
-    {
-        startActivity(newAcivity,null);
+    public void startActivity(Class<? extends Activity> newAcivity) {
+        startActivity(newAcivity, null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
     }
 }

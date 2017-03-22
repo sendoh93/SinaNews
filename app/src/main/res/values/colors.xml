@@ -8,5 +8,7 @@
     <color name="toolbar">#EB413D</color>
     <color name="bottom_color">#999999</color>
     <color name="bottom_tv_color">#AAAAAA</color>
+    <color name="user">#D70F15</color>
     <color name="transparent">@android:color/transparent</color>
+    <color name="btn_password">#9ACD32</color>
 </resources>
