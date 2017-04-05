@@ -1,6 +1,7 @@
 package com.tcs.sinanews.ui.adapter;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,11 @@ import android.view.ViewGroup;
 
 import com.bigkoo.convenientbanner.holder.CBViewHolderCreator;
 import com.bigkoo.convenientbanner.listener.OnItemClickListener;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.tcs.sinanews.R;
 import com.tcs.sinanews.bean.NewsList;
 import com.tcs.sinanews.ui.viewHolder.BannerViewHolder;
@@ -78,6 +84,17 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             NewsViewHolder newsViewHolder = (NewsViewHolder) holder;
             //由于header放置了一个图片轮播器占据了第0,1,2.3,4   5个位置，所以position从5开始
             NewsList newsList = mNewsLists.get(position + NUM_IMAGE - 1);
+            int width = 100, height = 70;
+            Uri uri = Uri.parse(newsList.getPicUrl());
+            ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+                    .setProgressiveRenderingEnabled(true)
+                    .setResizeOptions(new ResizeOptions(width,height))
+                    .build();
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(request)
+                    .setOldController(newsViewHolder.mSimpleDraweeView.getController())
+                    .build();
+            newsViewHolder.mSimpleDraweeView.setController(controller);
             newsViewHolder.mSimpleDraweeView.setImageURI(newsList.getPicUrl());
             newsViewHolder.mMTv.setText(newsList.getTitle());
             newsViewHolder.itemView.setOnClickListener(new View.OnClickListener() {

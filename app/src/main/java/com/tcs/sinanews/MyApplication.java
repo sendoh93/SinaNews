@@ -4,11 +4,12 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMOptions;
+import com.hyphenate.easeui.controller.EaseUI;
 
 import java.util.Iterator;
 import java.util.List;
@@ -32,8 +33,15 @@ public class MyApplication extends Application {
     }
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
+
         JPushInterface.setDebugMode(true);
         JPushInterface.init(this);
         Fresco.initialize(this);
@@ -58,9 +66,11 @@ public class MyApplication extends Application {
             return;
         }
 //初始化
-        EMClient.getInstance().init(appContext, options);
+/*        EMClient.getInstance().init(appContext, options);
 //在做打包混淆时，关闭debug模式，避免消耗不必要的资源
-        EMClient.getInstance().setDebugMode(true);
+        EMClient.getInstance().setDebugMode(true);*/
+        //初始化easyUi
+        EaseUI.getInstance().init(appContext, options);
     }
 
     private String getAppName(int pID) {

@@ -5,6 +5,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -22,9 +24,13 @@ public class MainFragment extends BaseFragment {
     TabLayout mTabNews;
     @Bind(R.id.vp_news)
     ViewPager mVpNews;
+    @Bind(R.id.main_toolbar)
+    Toolbar mToolbar;
     private SparseArray<Fragment> mSparseArray = new SparseArray<>();
+
     @Override
     public void init(Bundle savedInstanceState) {
+
     }
 
     @Override
@@ -32,15 +38,20 @@ public class MainFragment extends BaseFragment {
         return R.layout.fragment_main;
     }
 
+
     @Override
     public void initView(View view) {
         initNews();
-    }
+        mToolbar.setTitle(R.string.app_name);
+            ((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
+        }
+
 
     @Override
     protected void onFragmentFirstVisible() {
 
     }
+
     //初始化新闻fragment
     private void initNews() {
         for (int i = 0; i < Constant.framgets.length; i++) {
@@ -66,4 +77,5 @@ public class MainFragment extends BaseFragment {
         mTabNews.setTabMode(TabLayout.MODE_SCROLLABLE);
         mTabNews.setupWithViewPager(mVpNews);
     }
+
 }

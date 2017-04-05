@@ -3,7 +3,6 @@ package com.tcs.sinanews.ui.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +12,6 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.tcs.sinanews.R;
 import com.tcs.sinanews.ui.activity.interfaces.ActivityInterface;
 import com.tcs.sinanews.utils.EventBusHelper;
@@ -54,9 +52,9 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
         EventBusHelper.register(this);
         mContext = this;
         setTranslucentStatus(applyTranslucentStatus());
-        if (applySystemBarDrawable()) {
+        /*if (applySystemBarDrawable()) {
             setSystemBarTintDrawable(getResources().getDrawable(R.drawable.drawable_primary));
-        }
+        }*/
         Fresco.initialize(this);
         initBefore();
         setContentView(getLayoutResId());
@@ -80,7 +78,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
         EventBusHelper.unregister(this);
     }
 
-    private void setSystemBarTintDrawable(Drawable tintDrawable) {
+  /*  private void setSystemBarTintDrawable(Drawable tintDrawable) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             SystemBarTintManager mTintManager = new SystemBarTintManager(this);
             if (tintDrawable != null) {
@@ -91,7 +89,7 @@ public abstract class BaseActivity extends AppCompatActivity implements Activity
                 mTintManager.setTintDrawable(null);
             }
         }
-    }
+    }*/
 
     private void setTranslucentStatus(boolean on) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
